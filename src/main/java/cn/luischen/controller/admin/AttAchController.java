@@ -91,7 +91,16 @@ public class AttAchController {
             attAch.setAuthorId(sessionUser.getUid());
             attAch.setFtype(TaleUtils.isImage(file.getInputStream()) ? Types.IMAGE.getType() : Types.FILE.getType());
             attAch.setFname(fileName);
-            attAch.setFkey(qiniuCloudService.QINIU_UPLOAD_SITE + fileName);
+            String tmpPrefix = "";
+            if(qiniuCloudService.QINIU_UPLOAD_SITE.endsWith("/")){
+                tmpPrefix = qiniuCloudService.QINIU_UPLOAD_SITE;
+            }else{
+                tmpPrefix = qiniuCloudService.QINIU_UPLOAD_SITE+"/";
+            }
+            if(tmpPrefix.indexOf("http") == -1){
+                tmpPrefix = "http://"+tmpPrefix;
+            }
+            attAch.setFkey(tmpPrefix + fileName);
             attAchService.addAttAch(attAch);
             response.getWriter().write( "{\"success\": 1, \"message\":\"上传成功\",\"url\":\"" + attAch.getFkey() + "\"}" );
         } catch (IOException e) {
